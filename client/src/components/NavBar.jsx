@@ -1,62 +1,94 @@
-import React, { useContext } from "react"
-import { Context } from ".."
-import { Button, Container, Image } from "react-bootstrap"
+import { observer } from "mobx-react-lite"
+import React, { useContext, useState } from "react"
+import { Button, Container, Image, Navbar, Alert } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
+import { Context } from ".."
 import userImg from"../assets/user.png"
+import CreateBank from "./modals/CreateBank"
 
-const NavBar = () => {
-  const { store } = useContext(Context)
+
+const NavBar = observer (() => {
+  const { user } = useContext(Context)
   const navigate = useNavigate()
-  // style={{background: "blue"}}
+  const [visibleCreate, setVisibleCreate] = useState(false)
+  const [show, setShow] = useState(false)
+  
   return (
-    <Container className="d-flex justify-content-end">
-       <div className="mt-2">
-       {store.isAuth ? 
-       <div>
-        <Button
-          variant="outline-light" size="lg" 
-          style={{border: "none"}} 
-          onClick={() => navigate("/")}
-        >
-          Main
-        </Button>
-        <Button
-          variant="outline-light" size="lg" 
-          style={{border: "none"}} 
-          onClick={() => navigate("/banks")}
-        >
-          My Banks
-        </Button>
-        <Button
-          variant="outline-light" size="lg" 
-          style={{border: "none"}}  
-          onClick={() => navigate("/calculator")}
-        >
-          Calculator
-        </Button>
+    <Navbar bg="secondary">
+      <Container>
+        <div className="d-block">
+          <Button
+            variant="outline-light" size="lg" 
+            style={{border: "none"}}
+            onClick={() => {
+              user.isAuth ? setVisibleCreate(true) : setShow(true)
+            }}
+          >
+            Create bank
+          </Button>
+          {show &&
+            <Alert variant="warning" onClose={() => setShow(false)} dismissible className="mt-3 ml-3">
+              <Alert.Heading>Only authorized users are allowed to create banks</Alert.Heading>
+            </Alert>
+          }
+        </div> 
+        <div className="d-flex">
           <Button
             variant="outline-light" size="lg" 
             style={{border: "none"}} 
-              onClick={() => () => {
-                store.setUser({})
-                store.setIsAuth(false)
-              }}
+            onClick={() => navigate("/")}
           >
-            <Image src={userImg} height={25}/> Sign out
+            Main
           </Button>
-          </div>
-          :
-          <Button
-          variant="outline-light" size="lg" 
-          style={{border: "none"}} 
-            onClick={() => {navigate("/sign_in"); store.setIsAuth(true)}}
-          >
-            <Image src={userImg} height={25}/> Sign in
-          </Button>
-        }  
-      </div>
-    </Container>
+          <div>
+            {user.isAuth ?
+              <div>
+                <Button
+                  variant="outline-light" size="lg" 
+                  style={{border: "none"}} 
+                  onClick={() => navigate("/banks")}
+                >
+                  My Banks
+                </Button>
+                <Button
+                  variant="outline-light" size="lg" 
+                  style={{border: "none"}}  
+                  onClick={() => navigate("/calculator")}
+                >
+                  Calculator
+                </Button>
+                <Button
+                  variant="outline-light" size="lg" 
+                  style={{border: "none"}} 
+                  onClick={() => {
+                    user.setUser({})
+                    user.setIsAuth(false)
+                    navigate("/")
+                  }}
+                  >
+                  <Image src={userImg} height={25}/> Sign out
+                </Button>
+              </div>
+              :
+              <Button
+                variant="outline-light" size="lg" 
+                style={{border: "none", marginLeft: "auto"}} 
+                onClick={() => {
+                  navigate("/sign_in")
+                  // user.setIsAuth(true)
+                  setShow(false)
+                }}
+              >
+                <Image src={userImg} height={25}/> Sign in
+              </Button>
+            } 
+          </div> 
+        </div>
+      </Container>
+      <CreateBank show={visibleCreate} onHide={() => setVisibleCreate(false)} />
+    </Navbar>    
   )
-}
+})
 
 export default NavBar
+

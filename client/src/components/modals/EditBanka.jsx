@@ -1,17 +1,14 @@
 import React, { useState, useContext } from "react"
-import { Modal, Button, CloseButton, Form } from "react-bootstrap"
+import {Modal, Button, CloseButton, Form } from "react-bootstrap"
 import FormGroup from "../FormGroup"
-import { createBank, fetchBanks } from "../../http/bankAPI"
+import { editBank } from "../../http/bankAPI"
 import jwt_decode from "jwt-decode"
 import { observer } from "mobx-react-lite"
 import { Context } from "../.."
 
-// import BankForm from "../BankForm"
-
-const CreateBank = observer(({ show, onHide }) => {
-
+const EditBank = observer(({ show, onHide }) => {
   const { bank } = useContext(Context)
-  // console.log(bank.banks)
+  console.log(bank.selectedBank)
 
   const [fs, setFs] = useState("")
   const [name, setName] = useState("NAE Bank")
@@ -21,34 +18,26 @@ const CreateBank = observer(({ show, onHide }) => {
   const [interval, setInterval] = useState(12)
   const [minTerm, setMinTerm] = useState(12)
   const [maxTerm, setMaxTerm] = useState(10)
-  let userId = jwt_decode(localStorage.getItem("token")).id
-
-  const addBank = () => 
-    createBank({name, loanInterest: rate, maxLoan: loan, minPayment: payment, minLoanTerm: minTerm, maxLoanTerm: maxTerm, interval, userId })
-    .then(() => fetchBanks(userId)).then(data => bank.setBanks(data)).finally(() => {
-      // console.log(bank.banks)
-      setFs("")
-      onHide()
-    })
-    
+  const addChanges = () => {
+}
+  
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Body className="d-flex flex-column align-items-center">
         <CloseButton className="d-flex align-self-end" onClick={onHide} />
-        <div style={{width: 320}}>
-          <Form>
+        <Form style={{width: 330}}> 
             <FormGroup
               label={"Bank's name"}
-              valueInput={name} 
-              changeValue={event => setName(event.target.value)}
+              valueInput={bank.selectedBank.name} 
+              changeValue={e => bank.setSelectedBank({...bank.setSelectedBank, ...{name: e.target.value}})}
             />
             <FormGroup
               label={"Interest rate"}
               max={30} 
               step={0.1} 
-              valueInput={rate} 
-              valueRange={rate} 
-              changeValue={event => setRate(event.target.value)}
+              valueInput={bank.selectedBank.loanInterest} 
+              valueRange={bank.selectedBank.loanInterest} 
+              changeValue={e => bank.setSelectedBank({...bank.setSelectedBank, ...{loanInterest: e.target.value}})}
               wc={90}
             />
             <FormGroup
@@ -56,17 +45,19 @@ const CreateBank = observer(({ show, onHide }) => {
               min={10000}
               max={500000} 
               step={1000} 
-              valueRange={loan.replace(/\s/g, "")}
-              valueInput={loan.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ")} 
-              changeValue={event => setLoan(event.target.value)}
+              valueInput={bank.selectedBank.maxLoan && (bank.selectedBank.maxLoan).toString().replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+              valueRange={bank.selectedBank.maxLoan && (bank.selectedBank.maxLoan).toString().replace(/\s/g, "")}
+              // valueRange={bank.selectedBank.maxLoan}
+              // valueInput={bank.selectedBank.maxLoan}
+              changeValue={e => bank.setSelectedBank({...bank.setSelectedBank, ...{maxLoan: e.target.value}})} 
               wc={150}
             />
             <FormGroup 
               label={"Мinimum down payment"}
-              loan={loan}
+              loan={bank.selectedBank.maxLoan}
               max={50}  
-              valueInput={payment} 
-              valueRange={payment} 
+              valueInput={bank.selectedBank.minPayment} 
+              valueRange={bank.selectedBank.minPayment} 
               changeValue={event => setPayment(event.target.value)}
               wc={90}
             />
@@ -74,39 +65,41 @@ const CreateBank = observer(({ show, onHide }) => {
               label={"Minimum loan term"}
               min={1}
               max={36} 
-              valueInput={minTerm} 
-              valueRange={minTerm}  
+              valueInput={bank.selectedBank.minLoanTerm} 
+              valueRange={bank.selectedBank.minLoanTerm}  
               changeValue={event => setMinTerm(event.target.value)}
-              interval={interval}
+              interval={bank.selectedBank.interval}
               changeInterval={event => setInterval(event.target.value)}
               wc={90}
             /> 
             <FormGroup
               label={"Maximum loan term"}
-              min={(minTerm / interval).toFixed()}
+              min={(bank.selectedBank.minLoanTerm / bank.selectedBank.interval).toFixed()}
               max={50} 
-              valueInput={maxTerm} 
-              valueRange={maxTerm}  
+              valueInput={bank.selectedBank.maxLoanTerm} 
+              valueRange={bank.selectedBank.maxLoanTerm}  
               changeValue={event => setMaxTerm(event.target.value)}
-              minValue={(minTerm / interval).toFixed()}
+              minValue={(bank.selectedBank.minLoanTerm / bank.selectedBank.interval).toFixed()}
               wc={90}
             /> 
           </Form>
-        </div>
-        <Button 
-          type="submit"
+
+         <Button 
           variant="outline-primary" size="lg"
-          className="d-flex align-self-end mt-2" 
+          className="d-flex align-self-end mb-3" 
           style={{fontSize: fs, marginRight: 20, border: "none"}}
-          onMouseOver={() => setFs(24)}
+          onMouseOver={() => setFs(22)}
           onMouseLeave={() => setFs("")} 
-          onClick={addBank}
+          onClick={() => {
+            setFs("")
+            onHide()
+          }}
         >
-          Create a new bank
+          Apply to {"NAE Bank"}
         </Button>
       </Modal.Body>
     </Modal>
   )
 })
 
-export default CreateBank
+export default EditBank

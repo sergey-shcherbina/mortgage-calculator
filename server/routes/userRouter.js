@@ -10,8 +10,7 @@ const generateJwt = (id, email, name) => {
     {expiresIn: '2h'}  
   )
 }
-
-router.post("/registration", async (req, res) => { 
+router.post("/sign_up", async (req, res) => { 
   const {name, email, password} = req.body
   // if (!email || !password) {
   //   return res.status(404).json({message: "Enter email or password!"}) 
@@ -30,16 +29,10 @@ router.post("/registration", async (req, res) => {
   const user = await User.create({name, email, password: hashPassword}) 
   const token = generateJwt(user.id, user.email, user.name)
 
-  // const token = jwt.sign(
-  //  {id: user.id, email: user.email},
-  //  process.env.SECRET_KEY,
-  //  {expiresIn: "8h"}
-  // )
-
   return res.json({token})  
 }) 
 
-router.post("/login", async (req, res) => {
+router.post("/sign_in", async (req, res) => {
   const {email, password} = req.body
   const user = await User.findOne({where: {email}})
   if (!user) {

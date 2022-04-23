@@ -3,34 +3,32 @@ import { Form } from "react-bootstrap"
 import FormGroup from "./FormGroup"
 
 const BankForm = () => {
-  const [ name, setName ] = useState("NAE Bank")
-  const [ rate, setRate ] = useState(10)
-  const [ loan, setLoan ] = useState("100000")
-  const [ payment, setPayment ] = useState(20)
-  const [ term, setTerm ] = useState(12)
+  const [name, setName] = useState("NAE Bank")
+  const [rate, setRate] = useState(10)
+  const [loan, setLoan] = useState("100000")
+  const [payment, setPayment] = useState(20)
+  const [minTerm, setMinTerm] = useState(12)
+  const [interval, setInterval] = useState(12)
+  const [maxTerm, setMaxTerm] = useState(10)
   
-  
-
   return (
-    <Form style={{border: "1px solid white", borderRadius: 5, padding: 10, background: "darkblue"}}>
-      <FormGroup 
-        style={{width: 400}}
+    <Form>
+      <FormGroup
         label={"Bank's name"}
         valueInput={name} 
         changeValue={event => setName(event.target.value)}
       />
-      <FormGroup 
-        label={"Interest rate, %"}
+      <FormGroup
+        label={"Interest rate"}
         max={30} 
-        step={0.01} 
+        step={0.1} 
         valueInput={rate} 
         valueRange={rate} 
         changeValue={event => setRate(event.target.value)}
         wc={90}
       />
-
       <FormGroup
-        label={"Maximum loan, $"}
+        label={"Maximum loan"}
         min={10000}
         max={500000} 
         step={1000} 
@@ -46,15 +44,28 @@ const BankForm = () => {
         valueInput={payment} 
         valueRange={payment} 
         changeValue={event => setPayment(event.target.value)}
-        wc={54}
+        wc={90}
       />
-      <FormGroup 
-        label={"Loan term"}
+      <FormGroup
+        label={"Minimum loan term"}
+        min={1}
+        max={36} 
+        valueInput={minTerm} 
+        valueRange={minTerm}  
+        changeValue={event => setMinTerm(event.target.value)}
+        interval={interval}
+        changeInterval={event => setInterval(event.target.value)}
+        wc={90}
+      /> 
+      <FormGroup
+        label={"Maximum loan term"}
+        min={(minTerm / interval).toFixed()}
         max={50} 
-        valueInput={term} 
-        valueRange={term}  
-        changeValue={event => setTerm(event.target.value)}
-        wc={54}
+        valueInput={maxTerm} 
+        valueRange={maxTerm}  
+        changeValue={event => setMaxTerm(event.target.value)}
+        minValue={(minTerm / interval).toFixed()}
+        wc={90}
       /> 
     </Form>
   )

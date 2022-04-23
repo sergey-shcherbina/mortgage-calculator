@@ -1,14 +1,17 @@
 import React, { createContext } from "react"
-import ReactDOM from "react-dom/client"
+import ReactDOM from "react-dom"
 import App from "./App"
-import Store from "./store"
+import UserStore from "./store/UserStore" 
+import BankStore from "./store/BankStore"
 
-const container = document.getElementById("root")
-const root = ReactDOM.createRoot(container)
 export const Context = createContext(null)
 
-root.render(
-  <Context.Provider value={{store: new Store()}}>
+ReactDOM.render(
+  <Context.Provider value={{
+    user: new UserStore(),
+    bank: new BankStore()
+  }}>
     <App />
-  </Context.Provider>
+  </Context.Provider>,  
+  document.getElementById("root")
 )

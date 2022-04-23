@@ -10,10 +10,12 @@ const User = sequelize.define("user", {
 const Bank = sequelize.define("bank", {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   name: {type: DataTypes.STRING},
-  loan_interest: {type: DataTypes.FLOAT},
-  max_loan: {type: DataTypes.INTEGER},
-  min_paymant: {type: DataTypes.INTEGER},
-  loan_term: {type: DataTypes.INTEGER}
+  loanInterest: {type: DataTypes.FLOAT},
+  maxLoan: {type: DataTypes.INTEGER},
+  minPayment: {type: DataTypes.INTEGER},
+  minLoanTerm: {type: DataTypes.INTEGER},
+  maxLoanTerm: {type: DataTypes.INTEGER},
+  interval: {type: DataTypes.INTEGER}
 })
 
 User.hasMany(Bank)
