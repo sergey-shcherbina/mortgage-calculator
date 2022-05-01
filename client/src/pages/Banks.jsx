@@ -1,27 +1,21 @@
 import React, { useContext, useEffect, useState } from "react"
 import { Alert, Row, Col, Button, CloseButton, Table } from "react-bootstrap"
 import { fetchBanks, removeBank } from "../http/bankAPI"
-import jwt_decode from "jwt-decode"
 import { observer } from "mobx-react-lite"
-import EditBank from "../components/modals/EditBank"
-import CreateBank from "../components/modals/CreateBank"
+import EditBank from "../components/EditBank"
 import { Context } from ".."
 
 const Banks = observer(() => {
-  const { bank } = useContext(Context)
+  const { bank, user } = useContext(Context)
   const [fsButton, setFsButton] = useState("")
   const [fsTable, setFsTable] = useState("")
+  const [border, setBorder] = useState("")
   const [show, setShow] = useState(false)
-  const [visibleCreate, setVisibleCreate] = useState(false)
-  const [visibleEdit, setVisibleEdit] = useState(false)
-  let userId = jwt_decode(localStorage.getItem("token")).id
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    fetchBanks(userId).then(data => bank.setBanks(data))
-  
-    // .finally(() => console.log(bank.banks))
-  
-    }, [bank, userId]) 
+    fetchBanks(user.user.id).then(data => bank.setBanks(data))
+  }, [user.user.id, bank])
   
   return (
     <div className="d-flex flex-column">   
@@ -31,16 +25,19 @@ const Banks = observer(() => {
       <Table striped bordered hover >
         <thead style={{border:"none"}}>
           <tr>
-            <th>№</th>
-            <th>Bank's name</th>
-            <th>Interest rate</th>
-            <th>Maximum loan</th>
-            <th>Мin down payment</th>
-            <th>Min loan term</th>
-            <th>Max loan term</th>
+            <th><div className="d-flex justify-content-center">№</div></th>
+            <th><div className="d-flex justify-content-center">Bank's name</div></th>
+            <th><div className="d-flex justify-content-center">Interest rate</div></th>
+            <th><div className="d-flex justify-content-center">Maximum loan</div></th>
+            <th><div className="d-flex justify-content-center">Мin down payment</div></th>
+            <th><div className="d-flex justify-content-center">Min loan term</div></th>
+            <th><div className="d-flex justify-content-center">Max loan term</div></th>
           </tr>
         </thead>
-        {bank.banks.map((currentBank, index) =>
+        {[...bank.banks].sort((a, b) => {
+          if (a.name.toLowerCase() < b.name.toLowerCase()) return - 1 
+          return 1
+        }).map((currentBank, index) =>
           <tbody key={currentBank.id} style={{border:"none"}}>
             <tr>
               <td colSpan={7}>
@@ -50,14 +47,24 @@ const Banks = observer(() => {
                       <CloseButton onClick={() => setShow(false)} />
                     </div>
                     <Col md={6}>
-                      <Alert variant="success">
+                      <Alert variant="success"
+                        onMouseOver={() => {
+                          setBorder("solid green")
+                          setFsTable(24)
+                        }}
+                        onMouseLeave={() => {
+                          setBorder("")
+                          setFsTable("")
+                        }} 
+                      >
                         <Alert.Heading>Change {bank.selectedBank.name} Loan Terms</Alert.Heading>
                         <hr />
                         <div className="d-flex justify-content-end">
-                          <Button variant="success" size="lg" 
+                          <Button variant="success" size="lg"
                             onClick={() => {
-                              setVisibleEdit(true)
+                              setVisible(true)
                               setShow(false) 
+                              setBorder("")
                             }} 
                           >
                             Edit
@@ -66,14 +73,26 @@ const Banks = observer(() => {
                       </Alert>
                     </Col>
                     <Col md={6}>
-                      <Alert  variant="danger">
+                      <Alert  variant="danger"
+                        onMouseOver={() => {
+                          setBorder("solid red")
+                          setFsTable(24)
+                        }}
+                        onMouseLeave={() => {
+                          setBorder("")
+                          setFsTable("")
+                        }}
+                      >
                         <Alert.Heading>Remove {bank.selectedBank.name} from the list</Alert.Heading>
                         <hr />
                         <div className="d-flex justify-content-end">
                           <Button variant="danger" size="lg"
                             onClick={() => {
-
-                              setShow(false) 
+                              removeBank(bank.selectedBank.id).then(() => fetchBanks(user.user.id)
+                              .then(data => bank.setBanks(data))).finally(() => {
+                                setBorder("")
+                                setShow(false)
+                              }) 
                             }}
                           >
                             Delete 
@@ -86,7 +105,8 @@ const Banks = observer(() => {
               </td>
             </tr>
             <tr 
-              style={{cursor: "pointer", fontSize: bank.selectedBank.id === currentBank.id ? fsTable : ""}}
+              style={{cursor: "pointer", fontSize: bank.selectedBank.id === currentBank.id ? fsTable : "", 
+                border: bank.selectedBank.id === currentBank.id ? border : ""}}
               onMouseOver={() => {
                 bank.setSelectedBank(currentBank)
                 setFsTable(22)
@@ -97,35 +117,37 @@ const Banks = observer(() => {
               }}  
               onClick={() => setShow(true)} 
             >
-              <td>{index+1}</td>
-              <td>{currentBank.name}</td>
-              <td>{currentBank.loanInterest} %</td>
-              <td>{currentBank.maxLoan} $</td>
-              <td>{currentBank.minPayment} % or {(currentBank.minPayment / 100 * currentBank.maxLoan).toFixed()} $</td>
-              <td>{currentBank.minLoanTerm} {currentBank.interval === 12 ? "month" : "years"}</td>
-              <td>{currentBank.maxLoanTerm} years</td>
+              <td><div className="d-flex justify-content-center">{index + 1}</div></td>
+              <td><div className="d-flex justify-content-center">{currentBank.name}</div></td>
+              <td><div className="d-flex justify-content-center">{currentBank.loanInterest} %</div></td>
+              <td><div className="d-flex justify-content-center">{currentBank.maxLoan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
+              <td><div className="d-flex justify-content-center">{currentBank.minPayment} % or {(currentBank.minPayment * .01 * currentBank.maxLoan).toFixed().toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
+              <td><div className="d-flex justify-content-center">{currentBank.minLoanTerm} {currentBank.interval === 12 ? "month" : "years"}</div></td>
+              <td><div className="d-flex justify-content-center">{currentBank.maxLoanTerm} years</div></td>
             </tr>
           </tbody>
-        )}
+        )} 
         <tbody><tr style={{border: "none"}}><td colSpan={7}></td></tr></tbody><tbody><tr></tr></tbody>
       </Table>
-      <Button
-          // type="submit" 
+      <Button 
           variant="outline-secondary" size="lg"
           className="mb-4"
-          style={{fontSize: fsButton, marginTop: -18, border: "solid"}}
+          style={{fontSize: fsButton, marginTop: -18, border: "2px solid black", borderRadius: 1}}
           onMouseOver={() => setFsButton(26)} 
           onMouseLeave={() => setFsButton("")}
-          onClick={() => setVisibleCreate(true)}
+          onClick={() => {
+            bank.setSelectedBank({name: "NAE Bank", loanInterest: 10, maxLoan: 100000, minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 12})
+            setVisible(true)
+          }}
         >
           Create a new bank
         </Button>
-      <CreateBank show={visibleCreate} onHide={() => setVisibleCreate(false)} />
-      <EditBank show={visibleEdit} onHide={() => setVisibleEdit(false)} />   
+      <EditBank show={visible} onHide={() => setVisible(false)}  />
     </div>
   )
 })
-  
+
 export default Banks 
-  
-      
+
+
+               

@@ -4,7 +4,7 @@ const Main = () => {
 
   return (
     <div>
-     Main
+      There will also be a page
     </div>
   )
 }

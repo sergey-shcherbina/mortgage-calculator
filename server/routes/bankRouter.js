@@ -17,11 +17,7 @@ router.get("/", async (req, res) => {
   }
   return res.json(banks)
 })
-// router.get("/:id", async (req, res) => {
-//   const {id} = req.params
-//   const bank = await Bank.findOne({where: {id}}) 
-//   return res.json(bank)
-// })
+
 router.put("/:id", async (req, res) => {
   const {id} = req.params
   const {name, loanInterest, maxLoan,  minPayment, minLoanTerm, maxLoanTerm, interval, userId} = req.body

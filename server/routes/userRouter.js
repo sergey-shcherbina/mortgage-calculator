@@ -12,9 +12,6 @@ const generateJwt = (id, email, name) => {
 }
 router.post("/sign_up", async (req, res) => { 
   const {name, email, password} = req.body
-  // if (!email || !password) {
-  //   return res.status(404).json({message: "Enter email or password!"}) 
-  // }
   if (!email) {
     return res.status(404).json({message: "Enter email!"}) 
   }
@@ -52,7 +49,7 @@ router.get("/auth",
       next()
     }
     try {
-      const token = req.headers.authorization.split(" ")[1] // req.headers.authorization.split(" ")[0] - Bearer
+      const token = req.headers.authorization.split(" ")[1]
       if (!token) {
         return res.status(401).json({message: "User not authorized"})
       }

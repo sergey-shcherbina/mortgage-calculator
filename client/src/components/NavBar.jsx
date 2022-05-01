@@ -1,16 +1,15 @@
-import { observer } from "mobx-react-lite"
 import React, { useContext, useState } from "react"
 import { Button, Container, Image, Navbar, Alert } from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import { Context } from ".."
+import { observer } from "mobx-react-lite"
 import userImg from"../assets/user.png"
-import CreateBank from "./modals/CreateBank"
-
+import EditBank from "./EditBank"
 
 const NavBar = observer (() => {
-  const { user } = useContext(Context)
+  const { user, bank } = useContext(Context)
   const navigate = useNavigate()
-  const [visibleCreate, setVisibleCreate] = useState(false)
+  const [visible, setVisible] = useState(false)
   const [show, setShow] = useState(false)
   
   return (
@@ -21,10 +20,12 @@ const NavBar = observer (() => {
             variant="outline-light" size="lg" 
             style={{border: "none"}}
             onClick={() => {
-              user.isAuth ? setVisibleCreate(true) : setShow(true)
+              user.isAuth && bank.setSelectedBank({name: "NAE Bank", loanInterest: 10, maxLoan: 100000, 
+                minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 12})
+              user.isAuth ? setVisible(true) : setShow(true)
             }}
           >
-            Create bank
+            Create a new bank
           </Button>
           {show &&
             <Alert variant="warning" onClose={() => setShow(false)} dismissible className="mt-3 ml-3">
@@ -75,7 +76,6 @@ const NavBar = observer (() => {
                 style={{border: "none", marginLeft: "auto"}} 
                 onClick={() => {
                   navigate("/sign_in")
-                  // user.setIsAuth(true)
                   setShow(false)
                 }}
               >
@@ -85,7 +85,7 @@ const NavBar = observer (() => {
           </div> 
         </div>
       </Container>
-      <CreateBank show={visibleCreate} onHide={() => setVisibleCreate(false)} />
+      <EditBank show={visible} onHide={() => setVisible(false)} />
     </Navbar>    
   )
 })
