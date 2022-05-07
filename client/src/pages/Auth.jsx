@@ -79,17 +79,14 @@ const Auth = observer(() => {
 								Already have an account ?<NavLink to={"/sign_in"}>Sign in !</NavLink>
 							</div>
 						}
-            
-						<Button 
+            <Button 
 							variant={"outline-primary"} size="lg"
 							className="mt-3"
 							onClick={signUser}
 						>
 							{isSignIn ? "Sign in" : "Sign up"}
 						</Button>
-            
-          
-					</div>
+          </div>
 				</Form>
 			</Card>
 		</Container>		

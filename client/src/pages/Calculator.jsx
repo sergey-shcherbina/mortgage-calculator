@@ -1,12 +1,14 @@
 import React, { useContext, useState, useEffect } from "react"
-import { Row, Col, Table, Form, ListGroup, Container } from "react-bootstrap"
+import { Row, Col, Form, ListGroup, Container } from "react-bootstrap"
 import { Context } from ".."
 import { fetchBanks } from "../http/bankAPI"
+import { initMonths, years, allMonths, newYear, pd, interest, mp } from "../consts"
+import DataTable from "../components/DataTable" 
 
 const Calculator = () => {
   const { bank,user } = useContext(Context)
-  const [loan, setLoan] = useState("100000")
-  const [payment, setPayment] = useState("10000")
+  const [loanInput, setLoanInput] = useState("100000")
+  const [paymentInput, setPaymentInput] = useState("10000")
   const [name, setName] = useState("")
   const [term, setTerm ] = useState(12)
   const [interval, setInterval] = useState(1)
@@ -18,34 +20,27 @@ const Calculator = () => {
   const [checked, setChecked] = useState("")
   const [fw1, setFw1] = useState(500)
   const [fw2, setFw2] = useState(500)
-
+  const loan = loanInput.replace(/\s/g, "")
+  const payment = paymentInput.replace(/\s/g, "")
+  const [monthlyPayment, setMonthlyPayment] = useState("")
+  const [total, setTotal] = useState(0)
+  const monthlyDebt = (loan - payment) / (term * interval)
+  let debt = loan - payment
+  
   useEffect(() => {
-    fetchBanks(user.user.id).then(data => bank.setBanks(data))        
+    fetchBanks(user.user.id).then(data => bank.setBanks(data))         
   }, [user.user.id, bank])
-
-  const normalMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-  const initMonths = [...normalMonths].slice(new Date().getMonth()).concat([...normalMonths].splice(0, new Date().getMonth()))
-  const months = month ? [...initMonths].slice([...initMonths].indexOf(month)).concat([...initMonths].splice(0, [...initMonths].indexOf(month))) : initMonths
-  const allMonths = Array(Math.floor(term * interval / 12)).fill(months).flat().concat(...months.slice(0, (term * interval % 12)))
-  const years = Array(5).fill(new Date().getFullYear()).map((curYear, i) => curYear + i)
-
-  const newYear = (i, year) => Number(year) + Math.ceil((i - allMonths.indexOf("January") + 1) / 12)
-  const pd = (i, year) => new Date(newYear(i, year), normalMonths.indexOf(allMonths[i]) + 1, 0).getDate()
-  const interest = (debt) => bank.selectedBank.loanInterest / 100 / 12 * debt
-
-  let monthlyPayment = bank.selectedBank.loanInterest / 12 / 100 * (1 + bank.selectedBank.loanInterest / 12 / 100) ** (
-    term * interval) / ((1 + bank.selectedBank.loanInterest / 12 / 100) ** (term * interval) - 1) * (loan - payment), 
-    debt = loan - payment, monthlyDebt = (loan - payment) / (term * interval), 
-    total = monthlyPayment * term * interval, data
-  if (checked === "Annuity") 
-    data = allMonths.map((d, i) => d = {currentMonth: d, currentYear: newYear(i, year), pd: pd(i, year), currentPayment: monthlyPayment, currentInterest: 
-      interest(debt), currentDebt: monthlyPayment - interest(debt), currentRemainder: debt -= (monthlyPayment - interest(debt))})
-  if (checked === "Differentiated") {
-    total = 0
-    data = allMonths.map((d, i) => d = {currentMonth: d, currentYear: newYear(i, year), pd: pd(i, year), currentPayment: monthlyDebt + interest(loan - payment - monthlyDebt * i), currentInterest:
-      interest(loan - payment - monthlyDebt * i), currentDebt: monthlyDebt, currentRemainder:(loan - payment) - monthlyDebt * (i + 1), currentTotal: total += monthlyDebt + interest(loan - payment - monthlyDebt * i)})
-    monthlyPayment = data[0].currentPayment
-  }   
+  
+  const data = Array(allMonths(month, term, interval).length).fill({}).map((newData, i) => { 
+    return {...newData, currentMonth: allMonths(month, term, interval)[i], currentYear: newYear(i, year, month, term, interval),
+      pd: pd(i, year, month, term, interval), currentPayment: checked === "Annuity" ? monthlyPayment : checked === "Differentiated" && 
+      monthlyDebt + interest(loan - payment - monthlyDebt * i, bank.selectedBank.loanInterest), currentInterest: checked === "Annuity" ? 
+      interest(debt, bank.selectedBank.loanInterest) : checked === "Differentiated" && interest(loan - payment - monthlyDebt * i, 
+      bank.selectedBank.loanInterest), currentDebt: checked === "Annuity" ? monthlyPayment - interest(debt, bank.selectedBank.loanInterest) : 
+      checked === "Differentiated" && monthlyDebt, currentRemainder: checked === "Annuity" ? debt -= (monthlyPayment - 
+      interest(debt, bank.selectedBank.loanInterest)) : checked === "Differentiated" && (loan - payment) - monthlyDebt * (i + 1)
+    }
+  })
 
   return (
     <div className="mb-5">
@@ -60,8 +55,8 @@ const Calculator = () => {
             <div className="d-flex">
               <Form.Control
                 style={{marginTop: -6, fontWeight: 500, width: 150}}
-                value={loan.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-                onChange={e => setLoan(e.target.value)}
+                value={loanInput.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                onChange={e => setLoanInput(e.target.value)}
                 onFocus={() => {
                   setShowMain(false)
                   setShowPay(false)
@@ -73,8 +68,8 @@ const Calculator = () => {
             </div>
             <Form.Range 
               className="mt-1"
-              value={loan.replace(/\s/g, "")}
-              onChange={e => setLoan(e.target.value)}
+              value={loanInput.replace(/\s/g, "")}
+              onChange={e => setLoanInput(e.target.value)}
               onFocus={() => {
                 setShowMain(false)
                 setShowPay(false)
@@ -93,8 +88,8 @@ const Calculator = () => {
             <div className="d-flex">
               <Form.Control
                 style={{marginTop: -6, fontWeight: 500, width: 150}}
-                value={payment.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
-                onChange={e => setPayment(e.target.value)}
+                value={paymentInput.replace(/\s/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+                onChange={e => setPaymentInput(e.target.value)}
                 onFocus={() => {
                   setShowMain(false)
                   setShowPay(false)
@@ -106,8 +101,8 @@ const Calculator = () => {
             </div>
             <Form.Range 
               className="mt-1"
-              value={payment.replace(/\s/g, "")}
-              onChange={e => setPayment(e.target.value)}
+              value={paymentInput.replace(/\s/g, "")}
+              onChange={e => setPaymentInput(e.target.value)}
               onFocus={() => {
                 setShowMain(false)
                 setShowPay(false)
@@ -146,8 +141,11 @@ const Calculator = () => {
         </Col>
         {show &&
           <ListGroup style={{marginTop: -30}}>
-            {[...bank.banks].filter(bank => bank.minPayment < payment / loan * 100 && bank.maxLoan > loan)
-              .map(currentBank =>
+            {[...bank.banks].filter(bank => bank.minPayment <= payment / loan * 100 && bank.maxLoan >= loan)
+              .sort((a, b) => {
+                if (a.name.toLowerCase() < b.name.toLowerCase()) return - 1 
+                return 1
+              }).map(currentBank =>
               <ListGroup.Item key={currentBank.id}
                 className="d-flex justify-content-end"
                 style={{cursor: "pointer", marginLeft: "auto"}}
@@ -171,35 +169,47 @@ const Calculator = () => {
             <hr style={{margin: 1}} />
             <Col md={4} className="mt-2">
               <Form.Group>
-              <Form.Label style={{fontWeight: 700}}>
-                <div className="d-flex"> Loan term 
-                  <div className="d-flex" style={{fontWeight: 500, fontSize: 14, margin: "2px 0 0 4px"}}>(
-                    <div style={{color: "red"}}>
-                      from {bank.selectedBank.minLoanTerm} {bank.selectedBank.interval === 12 ? "month" : "years"} to {bank.selectedBank.maxLoanTerm} years
-                    </div>)
+                <Form.Label style={{fontWeight: 700}}>
+                  <div className="d-flex"> Loan term 
+                    <div className="d-flex" style={{fontWeight: 500, fontSize: 14, margin: "2px 0 0 4px"}}>(
+                      <div style={{color: "red"}}>
+                        from {bank.selectedBank.minLoanTerm} {bank.selectedBank.interval === 12 ? "month" : "years"} to {bank.selectedBank.maxLoanTerm} years
+                      </div>)
+                    </div>
                   </div>
-                </div>
-              </Form.Label>
-              <div className="d-flex">
-                <Form.Control
-                  style={{marginTop: -6, fontWeight: 500, width: 90}}
-                  value={term}
-                  onChange={e => setTerm(e.target.value)}
-                />
-                <div style ={{height: 30}}>
-                  <Form.Select 
-                    style={{width: 120, marginLeft: 15, marginTop: -6, fontWeight: 500}} 
-                    value={interval}
-                    onChange={e => setInterval(e.target.value)}
-                  >
-                    <option value={1}>Months</option>
-                    <option value={12}>Years</option>
-                  </Form.Select>
-                </div>
+                </Form.Label>
+                <div className="d-flex">
+                  <Form.Control
+                    style={{marginTop: -6, fontWeight: 500, width: 90}}
+                    value={term}
+                    onFocus={() => {
+                      setShowPay(false)
+                      setChecked("")
+                    }}
+                    onChange={e => setTerm(e.target.value)}
+                  />
+                  <div style ={{height: 30}}>
+                    <Form.Select 
+                      style={{width: 120, marginLeft: 15, marginTop: -6, fontWeight: 500}} 
+                      value={interval}
+                      onFocus={() => {
+                        setShowPay(false)
+                        setChecked("")
+                      }}
+                      onChange={e => setInterval(e.target.value)}
+                    >
+                      <option value="1">Months</option>
+                      <option value="12">Years</option>
+                    </Form.Select>
+                  </div>
                 </div>
                 <Form.Range 
                   className="mt-1"
                   value={term}
+                  onFocus={() => {
+                    setShowPay(false)
+                    setChecked("")
+                  }}
                   onChange={e => setTerm(e.target.value)}
                   min={1}
                   max={bank.selectedBank.maxLoanTerm}
@@ -220,6 +230,8 @@ const Calculator = () => {
                     setFw1(700)
                     setFw2(500)
                     setShowPay(true)
+                    setMonthlyPayment(mp(bank.selectedBank.loanInterest, loan, term, interval, payment))
+                    setTotal(mp(bank.selectedBank.loanInterest, loan, term, interval, payment) * term * interval)
                   }}
                   style={{fontWeight: fw1}}
                 />
@@ -233,6 +245,9 @@ const Calculator = () => {
                     setFw1(500)
                     setFw2(700)
                     setShowPay(true)
+                    setMonthlyPayment(monthlyDebt + interest(loan - payment, bank.selectedBank.loanInterest))
+                    setTotal(allMonths(month, term, interval).map((t, i) => t = monthlyDebt + interest(loan - payment -
+                      monthlyDebt * i  , bank.selectedBank.loanInterest)).reduce((sum, elem) => sum + elem, 0))  
                   }}
                   style={{fontWeight: fw2}}
                 />
@@ -250,7 +265,7 @@ const Calculator = () => {
                     {initMonths.map(currentMonth => <option key={currentMonth}>{currentMonth}</option>)}
                   </Form.Select>
                   <Form.Select 
-                    style={{width: 140, marginLeft: 20, fontWeight: 500}}
+                    style={{width: 100, marginLeft: 20, fontWeight: 500}}
                     value={year}
                     onChange={e => {setYear(e.target.value)
                     }}
@@ -268,66 +283,24 @@ const Calculator = () => {
             <hr style={{margin: 1}} />
             <Row>
               <Col md={4} className="mt-2" style={{fontWeight: "bold"}}>
-                {checked === "Differentiated" ? "Maximum mountly payment" : "Mountly payment"}
-                  <div style={{fontSize: 24}}>{monthlyPayment && monthlyPayment.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div>
+                {checked === "Differentiated" ? "Maximum monthly payment" : "Monthly payment"}
+                  <div style={{fontSize: 24}}>
+                    {monthlyPayment.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $
+                  </div>
               </Col>
               <Col md={4} className="mt-2" style={{fontWeight: "bold"}}>
                 Overpayment
-                <div style ={{fontSize: 24}}>{(Number(total) - (loan - payment)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</div>
+                <div style ={{fontSize: 24}}>{(total - (loan - payment)).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")}</div>
               </Col>
               <Col md={4} className="mt-2" style={{fontWeight: "bold"}}>
                 Return in total
-                <div style={{fontSize: 24}}>{total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div>
+                <div style={{fontSize: 24}}>{total && total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div>
               </Col>
             </Row>
           </>
         } 
       </Row>
-      {showPay &&
-        <> 
-          <div className="mt-4 mb-1 d-flex" style={{fontSize: 20, fontWeight: 700}}>
-            Payment schedule 
-            <div style={{fontSize: 14, fontWeight: 500, margin: "5px 0 0 5px"}}>(P.d. - "payment days")</div>
-          </div>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th><div className="d-flex justify-content-center">№</div></th>
-                <th><div className="d-flex justify-content-center">Date</div></th>
-                <th><div className="d-flex justify-content-center">P.d.</div></th>
-                <th><div className="d-flex justify-content-center">Amount of payment</div></th>
-                <th><div className="d-flex justify-content-center">Principal payment</div></th>
-                <th><div className="d-flex justify-content-center">Interest charges</div></th>
-                <th><div className="d-flex justify-content-center">Balance owed</div></th>
-                <th><div className="d-flex justify-content-center">Total balance</div></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((currentData, index) =>
-                <tr key={index} style={{fontWeight: 500}}>
-                  <td><div className="d-flex justify-content-center">{index + 1}</div></td>
-                  <td><div className="d-flex justify-content-center">{currentData.currentMonth} {currentData.currentYear}</div></td>
-                  <td><div className="d-flex justify-content-center">{currentData.pd}</div></td>
-                  <td><div className="d-flex justify-content-center">{currentData.currentPayment.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
-                  <td><div className="d-flex justify-content-center">{currentData.currentDebt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
-                  <td><div className="d-flex justify-content-center">{currentData.currentInterest.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
-                  <td>
-                    <div className="d-flex justify-content-center">
-                      {(currentData.currentRemainder + 0.001).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex justify-content-center">
-                      {(total -= currentData.currentPayment).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $
-                    </div>
-                  </td>
-                </tr>
-              )}
-              <tr><td colSpan={8} style={{borderTop: "2px solid black"}}></td></tr>
-            </tbody>
-          </Table>
-        </>
-      }
+      {showPay && <DataTable data={data} total={total} />}
     </div>
   )
 }

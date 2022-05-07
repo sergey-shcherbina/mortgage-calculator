@@ -122,7 +122,7 @@ const Banks = observer(() => {
               <td><div className="d-flex justify-content-center">{currentBank.loanInterest} %</div></td>
               <td><div className="d-flex justify-content-center">{currentBank.maxLoan.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
               <td><div className="d-flex justify-content-center">{currentBank.minPayment} % or {(currentBank.minPayment * .01 * currentBank.maxLoan).toFixed().toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
-              <td><div className="d-flex justify-content-center">{currentBank.minLoanTerm} {currentBank.interval === 12 ? "month" : "years"}</div></td>
+              <td><div className="d-flex justify-content-center">{currentBank.minLoanTerm} {currentBank.interval === 1 ? "month" : "years"}</div></td>
               <td><div className="d-flex justify-content-center">{currentBank.maxLoanTerm} years</div></td>
             </tr>
           </tbody>
@@ -136,7 +136,7 @@ const Banks = observer(() => {
           onMouseOver={() => setFsButton(26)} 
           onMouseLeave={() => setFsButton("")}
           onClick={() => {
-            bank.setSelectedBank({name: "NAE Bank", loanInterest: 10, maxLoan: 100000, minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 12})
+            bank.setSelectedBank({name: "A-Bank", loanInterest: 10, maxLoan: 100000, minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 1})
             setVisible(true)
           }}
         >

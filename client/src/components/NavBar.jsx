@@ -20,8 +20,7 @@ const NavBar = observer (() => {
             variant="outline-light" size="lg" 
             style={{border: "none"}}
             onClick={() => {
-              user.isAuth && bank.setSelectedBank({name: "NAE Bank", loanInterest: 10, maxLoan: 100000, 
-                minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 12})
+              user.isAuth && bank.setSelectedBank({name: "A-Bank", loanInterest: 10, maxLoan: 100000, minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 1})
               user.isAuth ? setVisible(true) : setShow(true)
             }}
           >
@@ -39,7 +38,7 @@ const NavBar = observer (() => {
             style={{border: "none"}} 
             onClick={() => navigate("/")}
           >
-            Main
+            Mortgage
           </Button>
           <div>
             {user.isAuth ?

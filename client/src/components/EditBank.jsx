@@ -11,7 +11,7 @@ const EditBank = observer(({ show, onHide }) => {
     bank.selectedBank.maxLoan.toString().replace(/\s/g, ""), minPayment: bank.selectedBank.minPayment, minLoanTerm: bank.selectedBank.minLoanTerm, 
     maxLoanTerm: bank.selectedBank.maxLoanTerm, interval: bank.selectedBank.interval, userId: user.user.id}}
 
-  return (
+    return (
     <Modal show={show} onHide={onHide}>
       <Modal.Body className="d-flex flex-column align-items-center">
         <CloseButton className="d-flex align-self-end" onClick={onHide} />
@@ -58,9 +58,7 @@ const EditBank = observer(({ show, onHide }) => {
             <Form.Range 
               className="mt-1"
               value={bank.selectedBank.maxLoan && bank.selectedBank.maxLoan.toString().replace(/\s/g, "")}
-              onChange={e => {
-                bank.setSelectedBank({...bank.selectedBank, maxLoan: e.target.value})
-              }}
+              onChange={e => bank.setSelectedBank({...bank.selectedBank, maxLoan: e.target.value})}
               min={50000}
               max={1000000} 
               step={5000}
@@ -106,8 +104,8 @@ const EditBank = observer(({ show, onHide }) => {
                 value={bank.setSelectedBank.interval}
                 onChange={e => bank.setSelectedBank({...bank.selectedBank, interval: e.target.value})}
               >
-                <option value={12}>Months</option>
-                <option value={1}>Years</option>
+                <option value="1">Months</option>
+                <option value="12">Years</option>
               </Form.Select>
             </div>
             </div>
@@ -156,7 +154,7 @@ const EditBank = observer(({ show, onHide }) => {
             })
           }
         >
-          {bank.selectedBank.id ? `Apply to ${bank.selectedBank.name}` : `Create a bank` } 
+          {bank.selectedBank.id ? `Apply to ${bank.selectedBank.name}` : `Create a ${bank.selectedBank.name}` } 
         </Button>
       </Modal.Body>
     </Modal>
