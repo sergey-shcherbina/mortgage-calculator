@@ -38,7 +38,7 @@ const NavBar = observer (() => {
             style={{border: "none"}} 
             onClick={() => navigate("/")}
           >
-            Mortgage
+            General page
           </Button>
           <div>
             {user.isAuth ?
@@ -55,7 +55,7 @@ const NavBar = observer (() => {
                   style={{border: "none"}}  
                   onClick={() => navigate("/calculator")}
                 >
-                  Calculator
+                  My Calculator
                 </Button>
                 <Button
                   variant="outline-light" size="lg" 
