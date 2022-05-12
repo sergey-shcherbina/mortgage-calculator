@@ -19,4 +19,3 @@ export default class UserStore {
     return this._user
   }
 }
-//

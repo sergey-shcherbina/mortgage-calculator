@@ -20,4 +20,3 @@ export {
   $authHost,
   baseURL
 }
-//

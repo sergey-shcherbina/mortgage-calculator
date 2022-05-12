@@ -61,5 +61,5 @@ const DataTable = ({ data, total }) => {
     </div>
   )
 }
-//
+
 export default DataTable

@@ -88,6 +88,6 @@ const NavBar = observer (() => {
     </Navbar>    
   )
 })
-//
+
 export default NavBar
 

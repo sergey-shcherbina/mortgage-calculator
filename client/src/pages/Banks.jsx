@@ -146,7 +146,7 @@ const Banks = observer(() => {
     </div>
   )
 })
-//
+
 export default Banks 
 
 

@@ -19,3 +19,4 @@ export default class BankStore {
     return this._selectedBank
   }
 }
+

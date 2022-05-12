@@ -26,5 +26,5 @@ export const data = (month, term, interval, year, monthlyPayment, checked, month
     interest(debt, int)) : checked === "Differentiated" && (loan - payment) - monthlyDebt * (i + 1)
   }})  
 } 
-//
+
 

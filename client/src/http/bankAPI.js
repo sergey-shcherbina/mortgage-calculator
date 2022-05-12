@@ -16,4 +16,3 @@ export const removeBank  = async (id) => {
   const {data} = await $authHost.delete("api/bank/" + id)
   return data 
 }
-//

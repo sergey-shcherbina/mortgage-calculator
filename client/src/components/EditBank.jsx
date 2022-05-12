@@ -160,5 +160,5 @@ const EditBank = observer(({ show, onHide }) => {
     </Modal>
   )
 })
-//
+
 export default EditBank
