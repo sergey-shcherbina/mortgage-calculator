@@ -227,9 +227,8 @@ const Main = () => {
         </Col>      
       </Row>
       {showPay && <DataTable data={data} total={total} />}
-        
     </div>
   )
 }
-
+//
 export default Main

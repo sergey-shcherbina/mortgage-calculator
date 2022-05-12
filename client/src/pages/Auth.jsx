@@ -92,5 +92,5 @@ const Auth = observer(() => {
 		</Container>		
 	);
 })        
-
+//
 export default Auth

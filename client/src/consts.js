@@ -26,15 +26,5 @@ export const data = (month, term, interval, year, monthlyPayment, checked, month
     interest(debt, int)) : checked === "Differentiated" && (loan - payment) - monthlyDebt * (i + 1)
   }})  
 } 
+//
 
-// const normalMonths = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-  // const initMonths = [...normalMonths].slice(new Date().getMonth()).concat([...normalMonths].splice(0, new Date().getMonth()))
-  // const months = month ? [...initMonths].slice([...initMonths].indexOf(month)).concat([...initMonths].splice(0, [...initMonths].indexOf(month))) : initMonths
-  //
-  //  const allMonths = Array(Math.floor(term * interval / 12)).fill(months).flat().concat(...months.slice(0, (term * interval % 12)))
-  // const years = Array(5).fill(new Date().getFullYear()).map((curYear, i) => curYear + i)
-
-  // const newYear = (i, year) => Number(year) + Math.ceil((i - allMonths(month, term, interval).indexOf("December")) / 12)
-  // const pd = (i, year,month, term, interval) => new Date(newYear(i, year,month, term, interval), normalMonths.indexOf(allMonths(month, term, interval)[i]) + 1, 0).getDate()
-
-  // const interest = (debt) => bank.selectedBank.loanInterest / 100 / 12 * debt

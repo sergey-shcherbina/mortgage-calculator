@@ -9,8 +9,8 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-app.use("/api/user", require("./routes/userRouter"))
-app.use("/api/bank", require("./routes/bankRouter"))
+app.use("api/user", require("./routes/userRouter"))
+app.use("api/bank", require("./routes/bankRouter"))
 
 const start = async () => {
   try {
@@ -23,3 +23,4 @@ const start = async () => {
 }
 
 start()
+//
