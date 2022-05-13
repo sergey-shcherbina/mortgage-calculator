@@ -2,7 +2,7 @@
 
 ## The application is built on the PERN stack
 
-## Server
+# Server
 
 ## npm install
 
