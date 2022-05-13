@@ -4,14 +4,14 @@
 
 # Server
 
-## npm install
+- ## npm install
 
-## npm start - start server
+- ## npm start - start server
 
-## npm run dev - start server in development mode
+- ## npm run dev - start server in development mode
 
 # Client
 
-## npm install
+- ## npm install
 
-## npm start - start client
+- ## npm start - start client
