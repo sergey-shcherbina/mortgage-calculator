@@ -1,7 +1,6 @@
 import axios from "axios"
 
-// const baseURL = process.env.NODE_ENV === "production" ? "/" : "http://localhost:3001/"
-const baseURL = "http://localhost:3001/"
+const baseURL = process.env.NODE_ENV === "production" ? "/" : "http://localhost:3001/"
 
 const $host = axios.create({
   baseURL
@@ -19,5 +18,4 @@ $authHost.interceptors.request.use(authInterceptor)
 export {
   $host,
   $authHost,
-  baseURL
 }
