@@ -32,6 +32,7 @@ const Banks = observer(() => {
             <th><div className="d-flex justify-content-center">Мin down payment</div></th>
             <th><div className="d-flex justify-content-center">Min loan term</div></th>
             <th><div className="d-flex justify-content-center">Max loan term</div></th>
+            <th><div className="d-flex justify-content-center">Date of creation</div></th>
           </tr>
         </thead>
         {[...bank.banks].sort((a, b) => {
@@ -40,7 +41,7 @@ const Banks = observer(() => {
         }).map((currentBank, index) =>
           <tbody key={currentBank.id} style={{border:"none"}}>
             <tr>
-              <td colSpan={7}>
+              <td colSpan={8}>
                 {bank.selectedBank.id === currentBank.id && show &&
                   <Row>
                     <div className="d-flex justify-content-end mb-2" >
@@ -124,24 +125,25 @@ const Banks = observer(() => {
               <td><div className="d-flex justify-content-center">{currentBank.minPayment} % or {(currentBank.minPayment * .01 * currentBank.maxLoan).toFixed().toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} $</div></td>
               <td><div className="d-flex justify-content-center">{currentBank.minLoanTerm} {currentBank.interval === 1 ? "month" : "years"}</div></td>
               <td><div className="d-flex justify-content-center">{currentBank.maxLoanTerm} years</div></td>
+              <td><div className="d-flex justify-content-center">{new Date(currentBank.createdAt).toUTCString().slice(4, -7)}</div></td>
             </tr>
           </tbody>
         )} 
         <tbody><tr style={{border: "none"}}><td colSpan={7}></td></tr></tbody><tbody><tr></tr></tbody>
       </Table>
       <Button 
-          variant="outline-secondary" size="lg"
-          className="mb-4"
-          style={{fontSize: fsButton, marginTop: -18, border: "2px solid black", borderRadius: 1}}
-          onMouseOver={() => setFsButton(26)} 
-          onMouseLeave={() => setFsButton("")}
-          onClick={() => {
-            bank.setSelectedBank({name: "A-Bank", loanInterest: 10, maxLoan: 100000, minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 1})
-            setVisible(true)
-          }}
-        >
-          Create a new bank
-        </Button>
+        variant="outline-secondary" size="lg"
+        className="mb-4"
+        style={{fontSize: fsButton, marginTop: -18, border: "2px solid black", borderRadius: 1}}
+        onMouseOver={() => setFsButton(26)} 
+        onMouseLeave={() => setFsButton("")}
+        onClick={() => {
+          bank.setSelectedBank({name: "A-Bank", loanInterest: 10, maxLoan: 100000, minPayment: 20, minLoanTerm: 12, maxLoanTerm: 20, interval: 1})
+          setVisible(true)
+        }}
+      >
+        Create a new bank
+      </Button>
       <EditBank show={visible} onHide={() => setVisible(false)}  />
     </div>
   )
