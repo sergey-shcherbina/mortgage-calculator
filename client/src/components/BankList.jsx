@@ -4,7 +4,6 @@ import { Context } from ".."
 
 const BankList = ({ loan, payment, changeName }) => {
   const { bank } = useContext(Context)
-  // const [name, setName] = useState("")
   return (
     <ListGroup style={{marginTop: -30}}>
       {[...bank.banks].filter(bank => bank.minPayment <= payment / loan * 100 && bank.maxLoan >= loan)

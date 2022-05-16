@@ -15,7 +15,7 @@ const LoanTerm = ({ label,  valueInput, valueRange, changeValue, min, max, wc, f
     max={max}
     wc={wc}
     focus={focus}
-    addForm={true && 
+    addForm={wc && 
       <Form.Select 
         style={{width: 120, margin: "-11px 0 0 15px", fontWeight: 500, background: back, height: 36}} 
         value={valueInterval}
